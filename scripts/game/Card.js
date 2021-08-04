@@ -1,9 +1,10 @@
 function Card(data) {
-	this.value = data.value.name;
-	this.color = data.color.name;
-	this.data = data;
-}
+    if (!data.color) {
+        data.color = {};
+    }
 
-Card.prototype = {
-	
+    this.title = data.value.name + (data.color.name ? "-" + data.color.name : "");
+    this.value = data.value;
+    this.color = data.color;
 }
+Card.prototype = {};
