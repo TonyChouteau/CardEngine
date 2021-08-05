@@ -6,9 +6,31 @@
 
 function Stack() {
     this.cards = [];
+    this.visible = false;
+    this.stacked = true;
+
+    this.displayed = false;
+    this.container;
 }
 
 Stack.prototype = {
+    setVisible: function (visible) {
+        this.visible = visible;
+        if (this.displayed) {
+            this.displayTo();
+        }
+
+        return this;
+    },
+
+    setStacked: function (stacked) {
+        this.stacked = stacked;
+        if (this.displayed) {
+            this.displayTo();
+        }
+
+        return this;
+    },
 
     addCard: function (card) {
         if (card.isCard) {
@@ -37,12 +59,20 @@ Stack.prototype = {
     },
 
     sort: function () {
-        this.cards = this.cards.sort((a, b) => a.value.sortValue - b.value.sortValue);
+        this.cards = this.cards.sort(
+            (a, b) => a.value.sortValue - b.value.sortValue
+        );
         return this;
     },
 
     draw: function () {
-        let card = this.cards.shift();
+        let card;
+
+        if (this.visible) {
+            card = this.cards.pop();
+        } else {
+            card = this.cards.shift();
+        }
 
         return card;
     },
@@ -79,21 +109,40 @@ Stack.prototype = {
         return decks;
     },
 
-    displayTo: function(elt) {
-        let container = $('<div class="cards_container"></div>');
-        let move = 0;
-        for (let i in this.cards) {
-            let $card = this.cards[i].displayTo(container);
-            $card.css({
-                "position": "absolute",
-                "left": move+"vw"
-            });
-            move += 2.3;
+    displayTo: function (elt) {
+
+        if (!this.container) {
+            this.container = $('<div class="cards_container"></div>');
+        } else {
+            this.container.html("");
         }
-        container.css({
-            width: (5*this.cards.length)/2+"vw",
-            height: 10+"vw"
-        });
-        elt.append(container);
-    }
+
+        let move = 0;
+        if (this.stacked) {
+            let $card = this.cards[0].displayTo(this.container, this.visible);
+            $card.css({
+                position: "absolute",
+                left: move + "vw",
+            });
+            this.container.css(Card.CSS);
+        } else {
+            for (let i in this.cards) {
+                let $card = this.cards[i].displayTo(this.container, this.visible);
+                $card.css({
+                    position: "absolute",
+                    left: move + "vw",
+                });
+                move += 2.5;
+            }
+            this.container.css({
+                width: (5 * this.cards.length) / 2 + 2.5 + "vw",
+                height: 10 + "vw",
+            });
+        }
+
+        
+        if (!this.displayed) {
+            elt.append(this.container);
+        }
+    },
 };

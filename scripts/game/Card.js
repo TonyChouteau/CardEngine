@@ -9,16 +9,42 @@ function Card(data) {
 
     this.isCard = true;
 }
+
+Card.WIDTH = 5;
+Card.HEIGHT = 10;
+Card.UNIT = "vw";
+Card.CSS = {
+    width: Card.WIDTH + Card.UNIT,
+    height: Card.HEIGHT + Card.UNIT,
+};
+
 Card.prototype = {
-    makeHTML: function() {
-        return `<div class="card">
-            <img class="card_img" src="./images/cards/` + (this.value.name + (this.color.name ? this.color.name : "")) + `.png">
+    makeHTML: function (visible) {
+        let img = "./images/cards/";
+        if (visible) {
+            img +=
+                this.value.name + (this.color.name ? this.color.name : "");
+        } else {
+            img += "back";
+        }
+        img += ".png";
+
+        const html =
+            `<div class="card">
+            <img class="card_img" src="` +
+            img +
+            `">
         </div>`;
+        const $html = $(html);
+        $html.css(Card.CSS);
+        $html.find(".card_img").css(Card.CSS);
+
+        return $html;
     },
 
-    displayTo: function(elt) {
-        let html = $(this.makeHTML());
+    displayTo: function (elt, visible) {
+        let html = $(this.makeHTML(visible));
         elt.append(html);
         return html;
-    }
+    },
 };
