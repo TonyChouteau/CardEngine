@@ -81,9 +81,19 @@ Stack.prototype = {
 
     displayTo: function(elt) {
         let container = $('<div class="cards_container"></div>');
+        let move = 0;
         for (let i in this.cards) {
-            this.cards[i].displayTo(container);
+            let $card = this.cards[i].displayTo(container);
+            $card.css({
+                "position": "absolute",
+                "left": move+"vw"
+            });
+            move += 2.3;
         }
+        container.css({
+            width: (5*this.cards.length)/2+"vw",
+            height: 10+"vw"
+        });
         elt.append(container);
     }
 };

@@ -17,6 +17,8 @@ Card.prototype = {
     },
 
     displayTo: function(elt) {
-        elt.append(this.makeHTML());
+        let html = $(this.makeHTML());
+        elt.append(html);
+        return html;
     }
 };
