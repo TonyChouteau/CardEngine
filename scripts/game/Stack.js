@@ -11,16 +11,33 @@ function Stack() {
 Stack.prototype = {
 
     addCard: function (card) {
-        this.cards.push(new Card(card));
+        if (card.isCard) {
+            this.cards.push(card);
+        } else {
+            this.cards.push(new Card(card));
+        }
 
         return this;
     },
 
-    shuffle: function () {
-        for (let i = 0; i < 5; i++) {
+    addCards: function (cards) {
+        for (let i in cards) {
+            this.addCard(cards[i]);
+        }
+
+        return this;
+    },
+
+    shuffle: function (n) {
+        for (let i = 0; i < (n || 5); i++) {
             this.cards = this.cards.sort(() => 0.5 - Math.random());
         }
 
+        return this;
+    },
+
+    sort: function () {
+        this.cards = this.cards.sort((a, b) => a.value.sortValue - b.value.sortValue);
         return this;
     },
 
@@ -30,27 +47,43 @@ Stack.prototype = {
         return card;
     },
 
-    deal: function (playerCount, cardPerPlayer) {
+    deal: function (cardPerPlayer, playerCount, cardsPerDraw) {
         if (this.cards.length < playerCount * cardPerPlayer) {
             return new Error(Error.NOT_ENOUGH_CARDS);
+        }
+        if (!cardsPerDraw) {
+            cardsPerDraw = 1;
+        }
+        if (!playerCount) {
+            playerCount = 1;
         }
 
         let decks = [];
         for (let i = 0; i < playerCount; i++) {
-            decks.push([]);
+            decks.push(new Stack());
         }
 
-        let k = -1;
-        for (let i = 0; i < cardPerPlayer; i++) {
-            k++;
-            if (k >= playerCount) {
-                k = 0;
+        let l = -1;
+        for (let i = 0; i < cardPerPlayer / cardsPerDraw; i++) {
+            l++;
+            if (l >= playerCount) {
+                l = 0;
             }
             for (let j = 0; j < playerCount; j++) {
-                decks[k].push(this.draw());
+                for (let k = 0; k < cardsPerDraw; k++) {
+                    decks[l].addCard(this.draw());
+                }
             }
         }
 
         return decks;
+    },
+
+    displayTo: function(elt) {
+        let container = $('<div class="cards_container"></div>');
+        for (let i in this.cards) {
+            this.cards[i].displayTo(container);
+        }
+        elt.append(container);
     }
 };
